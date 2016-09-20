@@ -31,7 +31,6 @@ def index():
 
             # User entry: get company name
             cname = request.form['company-name']
-            print cname
 
             # Find next most similar
             query = """
@@ -46,6 +45,8 @@ def index():
                 ,d.irs_number as primary_irs_number
                 ,d.filed_as_of_date as primary_filed_dt
                 ,d.business_description as primary_bus_desc
+                ,n.sim_score
+                ,n.sim_rank
                 ,s.id as next_id
                 ,s.company_conformed_name as next_name
                 ,s.sic_cd as next_sic_cd
@@ -57,30 +58,35 @@ def index():
                 ,s.filed_as_of_date as next_filed_dt
                 ,s.business_description as next_bus_desc
             from company_dets d
-            inner join next_sim n
+            inner join sims n
                 on d.id = n.id
             inner join company_dets s
-                on n.next_sim = s.id
+                on n.sim_id = s.id
             where replace(upper(d.COMPANY_CONFORMED_NAME), \' \', \'\') like
                 \'%""" + cname.upper().replace(' ', '') + """%\'
             """
 
             cursor.execute(query)
-            next_b = cursor.fetchall()[0]
-            primary_name = next_b[1].upper().replace('&AMP;', '&')
-            next_name = next_b[11].upper().replace('&AMP;', '&')
+
+            top_sims = cursor.fetchall()
+            primary_name = top_sims[0][1].upper().replace('&AMP;', '&')
             results.append(
-                'The name you entered most closely matches with: ' +
-                primary_name)
-            results.append(next_b[2])
-            results.append(
-                'The most similar company we found is: ' + next_name)
-            results.append(next_b[12])
-            results.append(next_b[19])
+                'Showing results for ' +
+                primary_name + ' [' + top_sims[0][2] + ']')
+
+            for i in range(3):
+                next_b = top_sims[i]
+                next_name = next_b[13].upper().replace('&AMP;', '&')
+                results.append(
+                    str(next_b[11]) + '. ' + next_name + ' [' +
+                    next_b[14] + ']')
+                results.append(
+                    '{0:2.0f}% similarity score'.format(next_b[10] * 100))
+                # results.append(next_b[21])
 
         except:
             errors.append(
-                "Unable to find a company with that name -- please try again"
+                "Unable to find similar companies -- please try again"
             )
 
     return render_template('index.html', errors=errors, results=results)

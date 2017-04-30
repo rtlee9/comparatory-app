@@ -4,11 +4,11 @@ from flask import render_template, request, jsonify, g, make_response
 from flask_stormpath import login_required, user
 from bokeh.embed import components
 
-from app import app
+from app import app, db
 from connect import get_es
 from utils import comp_case
 from visualizations import get_scatter
-from search import get_sim_results
+from models import Sim_search
 
 
 @app.context_processor
@@ -101,6 +101,11 @@ def search():
             target = sims['match']['key']
             results = OrderedDict(sorted(sims['results']['data'].items()))
             sim_ids = sims['results']['keys']
+
+            # Save search to db
+            db.session.add(Sim_search(user.get_id(), company))
+            db.session.commit()
+
         except Exception as e:
             errors.append(
                 "Unable to find similar companies -- please try again"

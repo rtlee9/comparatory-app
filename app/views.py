@@ -101,10 +101,11 @@ def search():
             target = sims['match']['key']
             results = OrderedDict(sorted(sims['results']['data'].items()))
             sim_ids = sims['results']['keys']
-        except:
+        except Exception as e:
             errors.append(
                 "Unable to find similar companies -- please try again"
             )
+            print(e)
 
     if target is not None:
         # Get scatter plot if results were found

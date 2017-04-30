@@ -1,3 +1,4 @@
+import requests
 import pandas as pd
 
 import matplotlib as mpl
@@ -7,17 +8,12 @@ from bokeh.models import HoverTool
 
 from connect import get_db
 from utils import comp_case
+from app import app
 
 
 def get_scatter_data():
-    cursor = get_db()
-    cursor.execute(
-        'select E.X1, E.X2, C.sic_cd, C.name, C.id '
-        'from embedded E '
-        'inner join company_dets C on E.id = C.id')
-    SNE_vecs = cursor.fetchall()
-    colnames = [desc[0] for desc in cursor.description]
-    return pd.DataFrame(SNE_vecs, columns=colnames)
+    data = requests.get(app.config['API_URL'] + "/plot").json()
+    return pd.read_json(data)
 
 
 def get_scatter(target=None, sim_ids=None):

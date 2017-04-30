@@ -1,3 +1,5 @@
+import requests
+from collections import OrderedDict
 from flask import render_template, request, jsonify, g, make_response
 from flask_stormpath import login_required, user
 from bokeh.embed import components
@@ -91,7 +93,14 @@ def search():
     if request.method == "POST":
         # Try getting results from SQL table, otherwise raise error
         try:
-            top_sims, match, target, results, sim_ids = get_sim_results()
+            company = request.form['company-name']
+            sims = requests.post(
+                app.config['API_URL'] + '/sim',
+                params={"company-name": company}).json()
+            match = sims['match']['data']
+            target = sims['match']['key']
+            results = OrderedDict(sorted(sims['results']['data'].items()))
+            sim_ids = sims['results']['keys']
         except:
             errors.append(
                 "Unable to find similar companies -- please try again"

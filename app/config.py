@@ -12,7 +12,11 @@ def set_config(app):
     SSLify(app)
     Bootstrap(app)
     app.config.from_object(os.environ['APP_SETTINGS'])
-    app.config['API_URL'] = os.environ['API_URL']
+    app.config['API_HOST'] = os.environ['API_HOST']
+    app.config['API_PORT'] = os.environ['API_PORT']
+    app.config['API_URL'] = '{}:{}'.format(
+        app.config['API_HOST'],
+        app.config['API_PORT'])
 
     # Set up SQLAlchemy DB
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

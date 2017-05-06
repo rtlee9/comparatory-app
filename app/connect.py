@@ -5,12 +5,12 @@ from flask import g
 from flask import current_app as app
 
 
-# Connect to AWS RDS
+# Connect to RDS
 def _connect_db():
-    conn_str = "host='{}' dbname='comparatory' user='{}' password='{}'".format(
-        app.config['AWS_RDS_HOST'],
-        app.config['AWS_RDS_USER'],
-        app.config['AWS_RDS_PASSWORD'])
+    conn_str = "postgres://{}:{}@{}/comparatory".format(
+        app.config['RDS_HOST'],
+        app.config['RDS_USER'],
+        app.config['RDS_PASSWORD'])
     conn = psycopg2.connect(conn_str)
     return conn.cursor()
 
@@ -22,7 +22,7 @@ def _connect_db_local():
     return conn.cursor()
 
 
-# Connnect to AWS elasticsearch
+# Connnect to elasticsearch
 def _connect_es():
     host = os.environ['ES_HOST']
     es = Elasticsearch(host)

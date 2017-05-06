@@ -23,10 +23,10 @@ def set_config(app):
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
     db = SQLAlchemy(app)
 
-    # AWS credentials
-    app.config['AWS_RDS_HOST'] = os.environ['AWS_RDS_HOST']
-    app.config['AWS_RDS_USER'] = os.environ['AWS_RDS_USER']
-    app.config['AWS_RDS_PASSWORD'] = os.environ['AWS_RDS_PASSWORD']
+    # RDS credentials
+    app.config['RDS_HOST'] = os.environ['RDS_HOST']
+    app.config['RDS_USER'] = os.environ['RDS_USER']
+    app.config['RDS_PASSWORD'] = os.environ['RDS_PASSWORD']
 
     # OAuth credentials and configuration
     app.config['SECRET_KEY'] = os.environ['STORMPATH_SECRET_KEY']
